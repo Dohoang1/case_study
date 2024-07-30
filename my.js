@@ -1,6 +1,5 @@
 let canvas = document.getElementById("gameCanvas");
 let ctx = canvas.getContext("2d");
-
 let basket = {
     width: 150,
     height: 20,
@@ -8,48 +7,33 @@ let basket = {
     y: canvas.height - 30,
     dx: 10,
     movingLeft: false,
-    movingRight: false,
-    color : getRandomColor()
+    movingRight: false
 };
 
 function getRandomColor() {
     let letters = '0123456789ABCDEF';
     let color = '#';
     for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
+        color += letters[Math.floor(Math.random() * letters.length)];
     }
     return color;
 }
 
-let beer = {
-    x: Math.random() * (canvas.width),
-    y: 0,
-    width: 20,
-    height: 30,
-    dy: 3,
-    color: getRandomColor(),
-};
+let beer1 = new Beer (
+    Math.random() * (canvas.width - 20),
+    0,
+    20,
+    30,
+    3,
+    getRandomColor()
+);
 
 let score = 0;
 let isGameOver = false;
 
-function drawBackground() {
-    let gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, '#2accfd'); // Sky blue
-    gradient.addColorStop(1, '#c9efff'); // Deep sky blue
-
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-}
-
 function drawBasket() {
-    ctx.fillStyle = basket.color;
+    ctx.fillStyle = "#8B4513";
     ctx.fillRect(basket.x, basket.y, basket.width, basket.height);
-}
-
-function drawBeer() {
-    ctx.fillStyle = beer.color;    ;
-    ctx.fillRect(beer.x, beer.y, beer.width, beer.height);
 }
 
 function drawScore() {
@@ -77,47 +61,42 @@ function update() {
     }
 
     for (let i = 1; i <= score / 5; i++) {
-        beer.dy = 3 + i;
+        beer1.dy = 3 + i;
     }
-
-    beer.y += beer.dy;
 
     if (
-        beer.y + beer.height >= basket.y &&
-        beer.x + beer.width >= basket.x &&
-        beer.x <= basket.x + basket.width
+        beer1.y + beer1.height >= basket.y &&
+        beer1.x + beer1.width >= basket.x &&
+        beer1.x <= basket.x + basket.width
     ) {
         score++;
-        resetBeer();
+        beer1.resetBeer(Math.random() * (canvas.width - 20), 0,3,getRandomColor());
     }
 
-    if (beer.y + beer.height >= canvas.height) {
+
+    if (beer1.y + beer1.height >= canvas.height) {
         isGameOver = true;
     }
-}
-
-function resetBeer() {
-    beer.x = Math.random() * (canvas.width - beer.width);
-    beer.y = 0;
-    beer.dy = 3;
-    beer.color = getRandomColor();
 }
 
 function gameLoop() {
     drawBackground();
     drawBasket();
-    drawBeer();
+    beer1.draw()
+    beer1.moveDown()
     drawScore();
+
     let img = document.getElementById("frog");
 
+
     if (isGameOver) {
+        img.src = "imgs/frog2.jfif"
         drawGameOver();
-        img.src = "frog2.jfif"
     } else {
-        if (score >=10) img.src = "frog4.jpg"
-        if (score >=20) img.src = "frog5.jpg"
-        if (score >=30) img.src = "frog6.jpg"
-        if (score >=40) img.src = "frog7.jpg"
+        if (score >=10) img.src = "imgs/frog4.jpg"
+        if (score >=20) img.src = "imgs/frog5.jpg"
+        if (score >=30) img.src = "imgs/frog6.jpg"
+        if (score >=40) img.src = "imgs/frog7.jpg"
         update();
         requestAnimationFrame(gameLoop);
     }
